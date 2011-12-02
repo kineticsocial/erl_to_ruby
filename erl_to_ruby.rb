@@ -119,13 +119,14 @@ class ErlBinary < ErlTerm
   def to_ruby
     self.str.gsub!(/[<>]/,"")
     bin_els = self.str.split(",")
-    bin_els.map { |el|
+    els = bin_els.map { |el|
       if el[/^[0-9]+$/]
         el.to_i
       elsif el[/^"/]
         el.gsub(/"/,"") 
       end
     }
+    els.length > 1 ? els : els[0]
   end
 end
 
@@ -163,7 +164,7 @@ class ErlTuple < ErlEnumeration
       (el.is_a?(ErlTerm) || el.is_a?(ErlEnumeration))? el.to_ruby : el
     }
     key = arr.delete_at(0)
-    hash = {key => arr}
+    hash = {key => ( arr.length>1 ? arr: arr[0])}
   end
 end
 
@@ -181,54 +182,4 @@ end
 #pp erl_to_ruby(" {a,[{a_foo,'ABCDE',\"ABCDE\",<<\"ABCDE\">>}]} ")
 #pp erl_to_ruby("   <<12,13,14,15,16,17,18,\"abcdefg\">> ")
 #pp erl_to_ruby("{true,<<\"o_e-13885-2\">>,expiry,          {63487411200,63519123599,[{offer,9434},{offer_url,none}]}}")
-#pp erl_to_ruby(%{
-#[{rules,[{true,<<"o_e-13885-2">>,expiry,
-          #{63487411200,63519123599,[{offer,9434},{offer_url,none}]}},
-       #{true,<<"o_e-13885">>,expiry,
-          #{63487411200,63519123599,[{offer,8983},{offer_url,none}]}},
-       #{true,<<"o_ng-100174">>,negative_geo,
-          #{stop,[{<<"usa">>,
-                #[[{region,[<<"tx">>]},{city,[<<"77">>]}],
-                  #[{region,[<<"ga">>]},{city,[<<"3">>]}],
-                  #[{region,[<<"ny">>]},{city,[<<"57">>]}],
-                  #[{region,[<<"ca">>]},{city,[<<"113">>,<<"157">>]}],
-                  #[{region,[<<"wa">>]},{city,[<<"114">>]}],
-                  #[{region,[<<"ma">>]},{city,[<<"20">>]}],
-                  #[{region,[<<"dc">>]},{city,[<<"60">>]}],
-                  #[{region,[<<"nj">>]},{city,[<<"499">>]}],
-                  #[{region,[<<"pa">>]},{city,[<<"29">>]}],
-                  #[{region,[<<"il">>]},{city,[<<"105">>]}]]}],
-                #[{offer,3565},{offer_url,none}]}},
-       #{false,<<"v_c-9633">>,volume_cap,
-            #{action,9633,revenue,
-                  #[{{13885,none},[{offer,9660},{offer_url,none}]}]}}]},
-#{params,[{accounting,0},
-       #{advertiser,2362},
-       #{affiliate,41015},
-       #{algo_name,none},
-       #{click_hash,none},
-       #{click_id,1933373817},
-       #{click_referer,none},
-       #{clickurl,none},
-       #{creative,none},
-       #{exclude_rules,[<<"blacklist">>]},
-       #{extra_params,[]},
-       #{geo,{geo,"usa","840","nj","31","newark","499","501","040.736",
-               #"-074.173","07104","-500","n"}},
-       #{impression,none},
-       #{impression_cluster,none},
-       #{impression_id,none},
-       #{in_offer_id,13885},
-       #{offer,13885},
-       #{offer_url,82481},
-       #{payout,0.0},
-       #{payout_type,cpa},
-       #{program,1},
-       #{revenue,0.0},
-       #{revenue_type,cpa},
-       #{sub,<<"JCT">>},
-       #{sub2,none},
-       #{third_party_creative,0},
-       #{traffic_type,2},
-       #{zone,none}]}]
-#})
+#pp erl_to_ruby( "[{sub,<<\"JCT\">>}, {sub2,none}]")
